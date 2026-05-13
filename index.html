@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)file:///Users/jpmartineau/Downloads/index_3.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candidate Fit Analyzer</title>
+<script src="./index_files/pdf.min.js"></script>
+<script src="./index_files/mammoth.browser.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f0f0f;color:#e8e8e8;min-height:100vh;display:flex;justify-content:center;padding:2rem 1rem}
+.w{width:100%;max-width:640px}
+.hdr{margin-bottom:2rem}
+.hdr h1{font-size:20px;font-weight:500;color:#f0f0f0;margin-bottom:4px}
+.hdr p{font-size:14px;color:#888}
+.prog{display:flex;gap:5px;margin-bottom:2rem}
+.ps{height:3px;flex:1;border-radius:2px;background:#2a2a2a;transition:background .3s}
+.ps.done{background:#1D9E75}.ps.act{background:#7F77DD}
+.step{display:none}.step.active{display:block}
+.slbl{font-size:11px;font-weight:500;color:#666;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.stitle{font-size:16px;font-weight:500;color:#f0f0f0;margin-bottom:1.25rem}
+.field{margin-bottom:.9rem}
+.field label{display:block;font-size:13px;color:#888;margin-bottom:5px}
+input[type=text],input[type=url],textarea{width:100%;font-size:14px;padding:8px 12px;border:1px solid #2a2a2a;border-radius:8px;background:#1a1a1a;color:#e8e8e8;font-family:inherit;transition:border-color .15s}
+input:focus,textarea:focus{outline:none;border-color:#7F77DD}
+textarea{resize:vertical;min-height:90px;line-height:1.5}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{font-size:11px;padding:1px 7px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:6px;color:#666;margin-left:7px}
+.up{border:1px dashed #2a2a2a;border-radius:8px;padding:12px;text-align:center;font-size:13px;color:#666;background:#141414;margin-top:5px;position:relative;cursor:pointer;transition:border-color .15s}
+.up:hover{border-color:#7F77DD}
+.up input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ftag{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 9px;border-radius:6px;margin:5px 3px 0}
+.ftag.reading{background:#2a2a1a;color:#f0a500}
+.ftag.ready{background:#1a2a1a;color:#1D9E75}
+.ftag.error{background:#2a1a1a;color:#f05050}
+.brow{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem}
+.btn{font-size:14px;font-weight:500;padding:8px 18px;border-radius:8px;cursor:pointer;border:1px solid #2a2a2a;background:transparent;color:#e8e8e8;font-family:inherit;transition:all .15s}
+.btn:hover{background:#1a1a1a}
+.btn.p{background:#534AB7;color:#fff;border-color:#534AB7}.btn.p:hover{background:#3C3489}
+.btn.g{color:#666;border-color:transparent}
+.rg{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.ro{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1px solid #2a2a2a;border-radius:8px;cursor:pointer;font-size:13px;background:#1a1a1a;transition:all .15s}
+.ro:has(input:checked){border-color:#7F77DD;background:#1e1c3a;color:#a09aff}
+.ro input{accent-color:#7F77DD}
+.warn{display:none;background:#2a1f00;border:1px solid #5a3e00;border-radius:8px;padding:9px 13px;font-size:13px;color:#f0a500;margin-bottom:.9rem}
+.warn.show{display:block}
+.srow{display:flex;gap:6px;padding:6px 0;border-bottom:1px solid #1e1e1e;font-size:13px}
+.sk{color:#666;min-width:140px;flex-shrink:0}
+.sv{color:#e8e8e8;flex:1}
+.ck{color:#1D9E75;margin-right:3px}
+.or{text-align:center;font-size:12px;color:#444;margin:9px 0;position:relative}
+.or::before,.or::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:#1e1e1e}
+.or::before{left:0}.or::after{right:0}
+.ibox{background:#141414;border:1px solid #2a2a2a;border-radius:8px;padding:11px 13px;font-size:13px;color:#666;line-height:1.6;margin-bottom:.9rem}
+.divider{border-top:1px solid #1e1e1e;padding-top:1rem;margin-top:.5rem}
+.sumbox{border:1px solid #2a2a2a;border-radius:8px;padding:13px 15px;margin-bottom:1.25rem}
+.sumtitle{font-size:13px;font-weight:500;color:#f0f0f0;margin-bottom:9px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal.show{display:flex}
+.modal-box{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:2rem;max-width:500px;width:100%}
+.modal-box h2{font-size:17px;font-weight:500;color:#f0f0f0;margin-bottom:.4rem}
+.modal-box p{font-size:13px;color:#888;line-height:1.6;margin-bottom:1.1rem}
+.steps-hint{display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem}
+.step-row{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#888;line-height:1.5}
+.step-num{width:22px;height:22px;border-radius:50%;background:#2a2a2a;color:#a09aff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-row strong{color:#e8e8e8}
+.step-row .note{font-size:11px;color:#555;display:block;margin-top:2px}
+.code{background:#0f0f0f;border:1px solid #2a2a2a;border-radius:8px;padding:1rem;font-family:monospace;font-size:11px;color:#a09aff;margin-bottom:1.1rem;white-space:pre-wrap;word-break:break-all;max-height:140px;overflow-y:auto}
+.btn-main{width:100%;background:#534AB7;color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s;text-decoration:none;display:block;text-align:center}
+.btn-main:hover{background:#3C3489}
+.btn-copy{width:100%;margin-top:8px;background:transparent;color:#888;border:1px solid #2a2a2a;padding:9px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-copy:hover{background:#1a1a1a;color:#e8e8e8}
+.btn-copy.done{color:#1D9E75;border-color:#1D9E75}
+.btn-close{width:100%;margin-top:8px;background:transparent;color:#555;border:none;padding:7px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit}
+.btn-close:hover{color:#888}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hdr">
+    <h1>Candidate fit analyzer</h1>
+    <p>Fill in the role brief once — analyze as many candidates as you need.</p>
+  </div>
+  <div class="prog">
+    <div class="ps act" id="p0"></div><div class="ps" id="p1"></div><div class="ps" id="p2"></div><div class="ps" id="p3"></div><div class="ps" id="p4"></div>
+  </div>
+
+  <div class="step active" id="s0">
+    <div class="slbl">Step 1 of 5 · Client</div>
+    <div class="stitle">Who is the client?</div>
+    <div class="field"><label>Company website</label><input type="url" id="cWeb" placeholder="https://acme.com"></div>
+    <div class="field"><label>Company LinkedIn</label><input type="url" id="cLI" placeholder="https://linkedin.com/company/acme"></div>
+    <div class="field"><label>Company name</label><input type="text" id="cName" placeholder="Acme Inc."></div>
+    <div class="brow"><span></span><button class="btn p" onclick="go(1)">Next →</button></div>
+  </div>
+
+  <div class="step" id="s1">
+    <div class="slbl">Step 2 of 5 · Role</div>
+    <div class="stitle">Job description &amp; role details</div>
+    <div class="field"><label>Job posting URL</label><input type="url" id="jUrl" placeholder="https://acme.com/jobs/senior-engineer"></div>
+    <div class="or">or paste / upload below</div>
+    <div class="field"><textarea id="jDesc" placeholder="Paste the full job description here…"></textarea></div>
+    <div class="field">
+      <label>Upload JD <span class="opt">optional</span></label>
+      <div class="up">↑ PDF or DOCX — text will be extracted<input type="file" id="jFile" accept=".pdf,.doc,.docx" onchange="readFile(&#39;jFile&#39;,&#39;jTag&#39;,&#39;jContent&#39;)"><div id="jTag"></div></div>
+    </div>
+    <div class="divider">
+      <div class="slbl" style="margin-bottom:9px">Role parameters</div>
+      <div class="field"><label>Work arrangement</label><div class="rg"><label class="ro"><input type="radio" name="w" value="Remote"> Remote</label><label class="ro"><input type="radio" name="w" value="Hybrid"> Hybrid</label><label class="ro"><input type="radio" name="w" value="On-site"> On-site</label></div></div>
+      <div class="r2">
+        <div class="field"><label>Office location</label><input type="text" id="rLoc" placeholder="e.g. Montréal, QC"></div>
+        <div class="field"><label>Job title</label><input type="text" id="jTitle" placeholder="e.g. Senior Engineer"></div>
+      </div>
+      <div class="r2">
+        <div class="field"><label>Salary min (CAD)</label><input type="text" id="sMin" placeholder="90,000"></div>
+        <div class="field"><label>Salary max (CAD)</label><input type="text" id="sMax" placeholder="130,000"></div>
+      </div>
+    </div>
+    <div class="warn" id="wWarn"><span id="wTxt"></span></div>
+    <div class="brow"><button class="btn g" onclick="go(0)">← Back</button><button class="btn p" onclick="val1()">Next →</button></div>
+  </div>
+
+  <div class="step" id="s2">
+    <div class="slbl">Step 3 of 5 · Context</div>
+    <div class="stitle">Intake notes &amp; context</div>
+    <div class="ibox">Metaview transcripts, intake call notes, verbal must-haves not in the JD, cultural signals.</div>
+    <div class="field"><label>Paste notes or transcript</label><textarea id="notes" placeholder="e.g. Client wants 0→1 experience. CTO is ex-Shopify. Fast decisions, no committees…" style="min-height:110px"></textarea></div>
+    <div class="field">
+      <label>Upload file <span class="opt">optional</span></label>
+      <div class="up">↑ PDF, DOCX or TXT — text will be extracted<input type="file" id="nFile" accept=".pdf,.doc,.docx,.txt" onchange="readFile(&#39;nFile&#39;,&#39;nTag&#39;,&#39;nContent&#39;)"><div id="nTag"></div></div>
+    </div>
+    <div class="brow"><button class="btn g" onclick="go(1)">← Back</button><button class="btn p" onclick="go(3)">Next →</button></div>
+  </div>
+
+  <div class="step" id="s3">
+    <div class="slbl">Step 4 of 5 · Benchmarks <span class="opt">optional</span></div>
+    <div class="stitle">Reference profiles</div>
+    <div class="ibox">Ideal employee sets the bar. Refused candidates define the "no" pattern — include reasons.</div>
+    <div class="field"><label>Ideal employee LinkedIn URL(s)</label><input type="text" id="ideal" placeholder="https://linkedin.com/in/… (comma-separate multiple)"></div>
+    <div class="field">
+      <label>Or upload resume(s)</label>
+      <div class="up">↑ PDF or DOCX — text will be extracted<input type="file" id="iFiles" accept=".pdf,.doc,.docx" multiple="" onchange="readFiles(&#39;iFiles&#39;,&#39;iTag&#39;,&#39;iContent&#39;)"><div id="iTag"></div></div>
+    </div>
+    <div class="field" style="margin-top:.9rem"><label>Refused candidates + reasons</label><textarea id="refused" placeholder="e.g. John D. — refused: big-co only, no startup DNA. Sarah M. — salary too high ($190k)." style="min-height:75px"></textarea></div>
+    <div class="field">
+      <div class="up">↑ Or upload refused profiles<input type="file" id="rFiles" accept=".pdf,.doc,.docx" multiple="" onchange="readFiles(&#39;rFiles&#39;,&#39;rTag&#39;,&#39;rContent&#39;)"><div id="rTag"></div></div>
+    </div>
+    <div class="brow"><button class="btn g" onclick="go(2)">← Back</button><button class="btn p" onclick="go(4)">Next →</button></div>
+  </div>
+
+  <div class="step" id="s4">
+    <div class="slbl">Step 5 of 5 · Analyze</div>
+    <div class="stitle">Review &amp; submit first candidate</div>
+    <div class="sumbox"><div class="sumtitle">Role brief summary</div><div id="sumRows"></div></div>
+    <div class="field"><label>Candidate LinkedIn Recruiter URL</label><input type="url" id="candUrl" placeholder="https://www.linkedin.com/recruiter/profile/…"></div>
+    <div class="or">and / or</div>
+    <div class="field">
+      <label>Upload candidate resume</label>
+      <div class="up">↑ PDF or DOCX — text will be extracted<input type="file" id="cvFile" accept=".pdf,.doc,.docx" onchange="readFile(&#39;cvFile&#39;,&#39;cvTag&#39;,&#39;cvContent&#39;)"><div id="cvTag"></div></div>
+    </div>
+    <div class="brow"><button class="btn g" onclick="go(3)">← Back</button><button class="btn p" onclick="submit()">Analyze candidate ↗</button></div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <h2>Ready to analyze ✓</h2>
+    <p>Brief copied to clipboard. Open your project in Claude, start a new chat, type <strong>start</strong> then paste.</p>
+    <div class="steps-hint">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div><strong>Click "Open in Claude"</strong> below — your project opens in a new tab<span class="note">New chat → type <strong>start</strong> → paste ⌘V / Ctrl+V</span></div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div><strong>Claude handles the full analysis</strong> from the brief + extracted file content</div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div><strong>LinkedIn Recruiter URL?</strong> Claude will ask you to switch to desktop<span class="note">Only needed when reading a live LinkedIn profile via browser MCP</span></div>
+      </div>
+    </div>
+    <div class="code" id="outputText"></div>
+    <a class="btn-main" href="https://claude.ai/project/019e0335-3c40-7264-b156-3558397405f8" target="_blank" onclick="autoCopy()">Open in Claude ↗</a>
+    <button class="btn-copy" id="copyBtn" onclick="copyOutput()">Copy brief again</button>
+    <button class="btn-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+var fileContent = { jContent:'', nContent:'', iContent:'', rContent:'', cvContent:'' };
+var cur = 0;
+
+function extractText(file) {
+  return new Promise(function(resolve) {
+    var name = file.name.toLowerCase();
+    if (name.endsWith('.txt')) {
+      var r = new FileReader();
+      r.onload = function(e) { resolve(e.target.result); };
+      r.onerror = function() { resolve(''); };
+      r.readAsText(file);
+    } else if (name.endsWith('.pdf')) {
+      var r = new FileReader();
+      r.onload = function(e) {
+        pdfjsLib.getDocument({data: e.target.result}).promise.then(function(pdf) {
+          var pages = [];
+          for (var i = 1; i <= pdf.numPages; i++) pages.push(i);
+          return Promise.all(pages.map(function(n) {
+            return pdf.getPage(n).then(function(page) {
+              return page.getTextContent().then(function(tc) {
+                return tc.items.map(function(i) { return i.str; }).join(' ');
+              });
+            });
+          }));
+        }).then(function(texts) { resolve(texts.join('\n')); })
+        .catch(function() { resolve(''); });
+      };
+      r.onerror = function() { resolve(''); };
+      r.readAsArrayBuffer(file);
+    } else if (name.endsWith('.docx') || name.endsWith('.doc')) {
+      var r = new FileReader();
+      r.onload = function(e) {
+        mammoth.extractRawText({arrayBuffer: e.target.result})
+          .then(function(result) { resolve(result.value); })
+          .catch(function() { resolve(''); });
+      };
+      r.onerror = function() { resolve(''); };
+      r.readAsArrayBuffer(file);
+    } else {
+      resolve('');
+    }
+  });
+}
+
+function readFile(inputId, tagId, contentKey) {
+  var file = document.getElementById(inputId).files[0];
+  if (!file) return;
+  var tag = document.getElementById(tagId);
+  tag.innerHTML = '<span class="ftag reading">⏳ Reading ' + file.name + '…</span>';
+  fileContent[contentKey] = '';
+  extractText(file).then(function(text) {
+    if (text && text.trim().length > 0) {
+      fileContent[contentKey] = text.trim();
+      tag.innerHTML = '<span class="ftag ready">✓ ' + file.name + ' (' + Math.round(text.length / 1000) + 'k chars extracted)</span>';
+    } else {
+      tag.innerHTML = '<span class="ftag error">⚠ Could not extract text from ' + file.name + '</span>';
+    }
+  });
+}
+
+function readFiles(inputId, tagId, contentKey) {
+  var files = document.getElementById(inputId).files;
+  if (!files.length) return;
+  var tag = document.getElementById(tagId);
+  tag.innerHTML = '<span class="ftag reading">⏳ Reading ' + files.length + ' file(s)…</span>';
+  fileContent[contentKey] = '';
+  var promises = [];
+  for (var i = 0; i < files.length; i++) promises.push(extractText(files[i]));
+  Promise.all(promises).then(function(texts) {
+    var combined = '';
+    for (var i = 0; i < files.length; i++) {
+      if (texts[i] && texts[i].trim()) combined += '--- ' + files[i].name + ' ---\n' + texts[i].trim() + '\n\n';
+    }
+    if (combined.trim()) {
+      fileContent[contentKey] = combined.trim();
+      tag.innerHTML = '<span class="ftag ready">✓ ' + files.length + ' file(s) extracted</span>';
+    } else {
+      tag.innerHTML = '<span class="ftag error">⚠ Could not extract text from files</span>';
+    }
+  });
+}
+
+function go(n) {
+  document.getElementById('s'+cur).classList.remove('active');
+  cur = n;
+  document.getElementById('s'+n).classList.add('active');
+  for (var i = 0; i < 5; i++) {
+    var el = document.getElementById('p'+i);
+    el.className = 'ps' + (i < cur ? ' done' : i === cur ? ' act' : '');
+  }
+  if (n === 4) buildSum();
+}
+
+function val1() {
+  var w = document.querySelector('input[name="w"]:checked');
+  var mn = document.getElementById('sMin').value.trim();
+  var mx = document.getElementById('sMax').value.trim();
+  var miss = [];
+  if (!w) miss.push('work arrangement');
+  if (!mn || !mx) miss.push('salary range');
+  var warn = document.getElementById('wWarn');
+  if (miss.length) {
+    document.getElementById('wTxt').textContent = 'Missing: ' + miss.join(' and ') + '. Both are required.';
+    warn.classList.add('show'); return;
+  }
+  warn.classList.remove('show');
+  go(2);
+}
+
+function buildSum() {
+  var w = document.querySelector('input[name="w"]:checked');
+  var jd = document.getElementById('jDesc').value;
+  var rows = [
+    ['Client', document.getElementById('cName').value || document.getElementById('cWeb').value || '—'],
+    ['Job title', document.getElementById('jTitle').value || '—'],
+    ['Job source', document.getElementById('jUrl').value || (jd.length > 0 ? 'Pasted' : fileContent.jContent ? 'Uploaded & extracted' : '—')],
+    ['Arrangement', w ? w.value : '—'],
+    ['Location', document.getElementById('rLoc').value || '—'],
+    ['Salary', (document.getElementById('sMin').value && document.getElementById('sMax').value) ? document.getElementById('sMin').value + '–' + document.getElementById('sMax').value + ' CAD' : '—'],
+    ['Context / notes', (document.getElementById('notes').value.length > 0 || fileContent.nContent) ? '✓ Added' : '—'],
+    ['Ideal profiles', (document.getElementById('ideal').value || fileContent.iContent) ? '✓ Added' : '—'],
+    ['Refused candidates', (document.getElementById('refused').value.length > 0 || fileContent.rContent) ? '✓ Added' : '—'],
+    ['Candidate resume', fileContent.cvContent ? '✓ Extracted' : document.getElementById('candUrl').value ? 'LinkedIn URL provided' : '—']
+  ];
+  document.getElementById('sumRows').innerHTML = rows.map(function(r) {
+    return '<div class="srow"><span class="sk">' + r[0] + '</span><span class="sv">' + (r[1] !== '—' ? '<span class="ck">✓</span>' : '') + r[1] + '</span></div>';
+  }).join('');
+}
+
+function buildPrompt() {
+  var w = document.querySelector('input[name="w"]:checked');
+  var jd = document.getElementById('jDesc').value;
+  var url = document.getElementById('candUrl').value.trim();
+  var lines = ['ROLE BRIEF'];
+  lines.push('Company: ' + (document.getElementById('cName').value || '—'));
+  lines.push('Website: ' + (document.getElementById('cWeb').value || '—'));
+  lines.push('LinkedIn: ' + (document.getElementById('cLI').value || '—'));
+  lines.push('Job title: ' + (document.getElementById('jTitle').value || '—'));
+  var ju = document.getElementById('jUrl').value;
+  if (ju) lines.push('Job URL: ' + ju);
+  if (jd) lines.push('Job description:\n' + jd.substring(0, 1500));
+  else if (fileContent.jContent) lines.push('Job description (extracted from file):\n' + fileContent.jContent.substring(0, 1500));
+  lines.push('Work arrangement: ' + (w ? w.value : '—'));
+  lines.push('Location: ' + (document.getElementById('rLoc').value || '—'));
+  lines.push('Salary: ' + document.getElementById('sMin').value + '–' + document.getElementById('sMax').value + ' CAD');
+  var nt = document.getElementById('notes').value;
+  if (nt) lines.push('Intake notes:\n' + nt.substring(0, 1000));
+  else if (fileContent.nContent) lines.push('Intake notes (extracted from file):\n' + fileContent.nContent.substring(0, 1000));
+  var id = document.getElementById('ideal').value;
+  if (id) lines.push('Ideal profiles (LinkedIn): ' + id);
+  if (fileContent.iContent) lines.push('Ideal employee profiles (extracted from files):\n' + fileContent.iContent.substring(0, 1500));
+  var rf = document.getElementById('refused').value;
+  if (rf) lines.push('Refused candidates:\n' + rf.substring(0, 800));
+  if (fileContent.rContent) lines.push('Refused candidate profiles (extracted from files):\n' + fileContent.rContent.substring(0, 800));
+  lines.push('\nCANDIDATE');
+  if (url) lines.push('LinkedIn Recruiter URL: ' + url);
+  if (fileContent.cvContent) lines.push('Resume (extracted from file):\n' + fileContent.cvContent.substring(0, 3000));
+  lines.push('\nAnalyze this candidate against the role brief and produce the full fit report.');
+  return lines.join('\n');
+}
+
+function submit() {
+  var url = document.getElementById('candUrl').value.trim();
+  var hasCv = fileContent.cvContent;
+  if (!url && !hasCv) {
+    alert('Please provide a LinkedIn Recruiter URL and/or upload a candidate resume.');
+    return;
+  }
+  var prompt = buildPrompt();
+  document.getElementById('outputText').textContent = prompt;
+  navigator.clipboard.writeText(prompt).catch(function(){});
+  document.getElementById('modal').classList.add('show');
+}
+
+function autoCopy() {
+  var text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).catch(function(){});
+}
+
+function copyOutput() {
+  var text = document.getElementById('outputText').textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('done');
+    setTimeout(function() { btn.textContent = 'Copy brief again'; btn.classList.remove('done'); }, 2500);
+  });
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+
+
+</body></html>
